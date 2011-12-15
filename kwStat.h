@@ -117,7 +117,7 @@ int64_t file_length(const char* fn)
     }
   else
     {
-    return 0;
+    return -1;
     }
   }
 
