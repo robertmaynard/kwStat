@@ -63,7 +63,7 @@
 //setup kwStat
 #if defined(KW_USE_GNUC_STAT_64)
 
-typedef stat64 kwStat;
+typedef struct stat64 kwStat;
 
 extern int kw_stat(const char* fn, kwStat *ks)
   {
@@ -72,7 +72,7 @@ extern int kw_stat(const char* fn, kwStat *ks)
 
 #elif defined(KW_USE_MS_STAT_64)
 
-typedef _stat64 kwStat;
+typedef struct _stat64 kwStat;
 
 extern int kw_stat(const char* fn, kwStat *ks)
   {
@@ -81,7 +81,7 @@ extern int kw_stat(const char* fn, kwStat *ks)
 
 #elif defined(KW_USE_MS_STAT_I64)
 
-typedef _stat32i64 kwStat;
+typedef struct _stat32i64 kwStat;
 
 extern int kw_stat(const char* fn, kwStat *ks)
   {
@@ -97,4 +97,29 @@ extern int kw_stat(const char* fn, kwStat *ks)
   return stat(fn,ks);
   }
 #endif
+
+namespace kw
+{
+
+bool file_exists(const char* fn)
+  {
+  kwStat ks;
+  return static_cast<bool>(kw_stat(fn,&ks));
+  }
+
+int64_t file_length(const char* fn)
+  {
+  kwStat ks;
+  int ret = kw_stat(fn,&ks);
+  if(ret==0)
+    {
+    return ks.st_size;
+    }
+  else
+    {
+    return 0;
+    }
+  }
+
+}//end namespace
 
