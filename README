@@ -6,12 +6,42 @@ stat function.
 
 The primary goal is to always provide the largest aviable stat function.
 So on Large Address 32bit builds we only plan on providing the 64bit stat function.
+Currently we are focused on getting file validity and file size functions correct.
+The second stage is to generalize the time aspect
 
-
-Usage:
+Usage of file_exists:
 
   #include "kwStat.h"
   #include <iostream>
+
+  int main(int argc, char **argv)
+  {
+    bool exists = kw::file_exists("test.txt");
+    return exists;
+  }
+
+Usage of file_length:
+
+  #include "kwStat.h"
+  #include <iostream>
+
+  int main(int argc, char **argv)
+  {
+    const char* fn="test.txt";
+    bool exists = kw::file_exists(fn);
+    if(exists)
+      {
+      assert(kw::file_length(fn)==0);
+      }
+    return exists;
+  }
+
+Usage of kwStat:
+
+  #include "kwStat.h"
+  #include <iostream>
+  //note kwStat doesn't unify time and still does
+  //32bit time on windows large address
 
   int main(int argc, char **argv)
   {
