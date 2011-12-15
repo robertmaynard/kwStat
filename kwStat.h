@@ -65,21 +65,36 @@
 
 typedef stat64 kwStat;
 
+extern int kw_stat(const char* fn, kwStat *ks)
+  {
+  return stat64(fn,ks);
+  }
+
 #elif defined(KW_USE_MS_STAT_64)
 
 typedef _stat64 kwStat;
+
+extern int kw_stat(const char* fn, kwStat *ks)
+  {
+  return _stat64(fn,ks);
+  }
 
 #elif defined(KW_USE_MS_STAT_I64)
 
 typedef _stat32i64 kwStat;
 
+extern int kw_stat(const char* fn, kwStat *ks)
+  {
+  return _stat32i64(fn,ks);
+  }
+
 #else
 
 typedef struct stat kwStat;
-
-#endif
 
 extern int kw_stat(const char* fn, kwStat *ks)
   {
   return stat(fn,ks);
   }
+#endif
+
