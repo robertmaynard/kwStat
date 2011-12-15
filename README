@@ -1,0 +1,33 @@
+kwStat a cross platform stat function and structure.
+
+The goal is to provide a simple wrapper to to stat on 32bit and 64bit machines
+that properly handle large address support and the different signatures of the
+stat function.
+
+The primary goal is to always provide the largest aviable stat function.
+So on Large Address 32bit builds we only plan on providing the 64bit stat function.
+
+
+Usage:
+
+  #include "kwStat.h"
+  #include <iostream>
+
+  int main(int argc, char **argv)
+  {
+    const char* fname = "test.txt";
+    kwStat ks;
+    int ret = kw_stat(fname,&ks);
+    if (!ret)
+      {
+      std::cout << "failed to open file" << std::endl;
+      }
+    else
+      {
+      off_t size = ks.st_size;
+      std::cout << "File test.txt has a length of " << size << std::endl;
+      }
+    return ret;
+  }
+
+ 
