@@ -9,10 +9,11 @@
   implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the License for more information.
 ============================================================================*/
-
+#include <stdint.h>
 #if defined(__GNUC__)
 //a great read on 64bit file support for Linux is:
 //www.gnu.org/s/libc/manual/html_node/Feature-Test-Macros.html
+#include <inttypes.h>
 
 #if  defined(_LARGEFILE64_SOURCE) && \
    (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS < 64)
@@ -43,6 +44,7 @@
 
 #elif defined(__APPLE__)
 // Mac OSX
+#include <inttypes.h>
 
 //on OSX SDK 10.5 stat64 needs to be used if using 64bits.
 //on OSX SDK 10.6 you need to check the _DARWIN_FEATURE_64_BIT_INODE
@@ -53,9 +55,7 @@
 
 #endif
 
-
 //now that we know what we want include stat
-
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -104,7 +104,8 @@ namespace kw
 bool file_exists(const char* fn)
   {
   kwStat ks;
-  return static_cast<bool>(kw_stat(fn,&ks));
+  int ret = kw_stat(fn,&ks);
+  return (ret == 0); //c style return so 0 is exists
   }
 
 int64_t file_length(const char* fn)
