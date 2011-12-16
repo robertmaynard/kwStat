@@ -130,19 +130,19 @@ class stat
 
   private:
   //setup kwStat
-  #if defined(KW_USE_GNUC_STAT_64)
-  typedef struct stat64 kwStat;
-# define stat_func stat64  
-  #elif defined(KW_USE_MS_STAT_64)
+#if defined(KW_USE_GNUC_STAT_64)
+  typedef struct ::stat64 kwStat;
+# define stat_func ::stat64
+#elif defined(KW_USE_MS_STAT_64)
   typedef struct _stat64 kwStat;
 # define stat_func _stat64
-  #elif defined(KW_USE_MS_STAT_I64)
+#elif defined(KW_USE_MS_STAT_I64)
   typedef struct _stat32i64 kwStat;
 # define stat_func _stat32i64
-  #else
-  typedef struct stat kwStat;
-# define stat_func stat
-  #endif
+#else
+  typedef struct ::stat kwStat;
+# define stat_func ::stat
+#endif
 
   bool Exists_;
   kwStat Stat_;
