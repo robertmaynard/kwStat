@@ -10,6 +10,8 @@
   See the License for more information.
 ============================================================================*/
 #include <stdint.h>
+#include <string>
+
 #if defined(__GNUC__)
 //a great read on 64bit file support for Linux is:
 //www.gnu.org/s/libc/manual/html_node/Feature-Test-Macros.html
@@ -59,68 +61,98 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-
-//setup kwStat
-#if defined(KW_USE_GNUC_STAT_64)
-
-typedef struct stat64 kwStat;
-
-extern int kw_stat(const char* fn, kwStat *ks)
-  {
-  return stat64(fn,ks);
-  }
-
-#elif defined(KW_USE_MS_STAT_64)
-
-typedef struct _stat64 kwStat;
-
-extern int kw_stat(const char* fn, kwStat *ks)
-  {
-  return _stat64(fn,ks);
-  }
-
-#elif defined(KW_USE_MS_STAT_I64)
-
-typedef struct _stat32i64 kwStat;
-
-extern int kw_stat(const char* fn, kwStat *ks)
-  {
-  return _stat32i64(fn,ks);
-  }
-
-#else
-
-typedef struct stat kwStat;
-
-extern int kw_stat(const char* fn, kwStat *ks)
-  {
-  return stat(fn,ks);
-  }
-#endif
-
 namespace kw
 {
 
-bool file_exists(const char* fn)
+class stat
   {
-  kwStat ks;
-  int ret = kw_stat(fn,&ks);
-  return (ret == 0); //c style return so 0 is exists
-  }
+  public:
+  stat(const char* fn):
+    Exists_(false)
+    {
+    this->init(fn);
+    }
 
-int64_t file_length(const char* fn)
-  {
-  kwStat ks;
-  int ret = kw_stat(fn,&ks);
-  if(ret==0)
+  stat(const std::string &fn):
+    Exists_(false)
     {
-    return ks.st_size;
+    this->init(fn.c_str());
     }
-  else
+
+  //copy constructors
+  stat(const stat &other):
+    Exists_(other.Exists_),
+    Stat_(other.Stat_)
     {
-    return -1;
+    
     }
-  }
+
+  //assignment operator
+  stat & operator= (const stat &other)
+    {
+    if(this!=&other)
+      {
+      this->Exists_ = other.Exists_;
+      this->Stat_ = other.Stat_;
+      }
+    return *this;
+    }
+
+  //destructor
+  ~stat(){}
+
+  //check if we have a valid stat object
+  bool fileExists( ) const { return Exists_;}
+
+  //return the length of the file
+  int64_t fileLength() const
+    {
+    return this->fileExists() ? this->Stat_.st_size : -1;    
+    };
+
+  //return the last modified time of the file
+  int64_t modifiedTime() const
+    {
+    return this->fileExists() ? this->Stat_.st_mtime : -1;
+    }
+
+  //return the last status time of the file
+  int64_t statusTime() const
+    {
+    return this->fileExists() ? this->Stat_.st_ctime : -1;
+    }
+
+  //return the last access time of the file
+  int64_t accessTime() const
+    {
+    return this->fileExists() ? this->Stat_.st_atime : -1;
+    }
+
+  private:
+  //setup kwStat
+  #if defined(KW_USE_GNUC_STAT_64)
+  typedef struct stat64 kwStat;
+# define stat_func stat64  
+  #elif defined(KW_USE_MS_STAT_64)
+  typedef struct _stat64 kwStat;
+# define stat_func _stat64
+  #elif defined(KW_USE_MS_STAT_I64)
+  typedef struct _stat32i64 kwStat;
+# define stat_func _stat32i64
+  #else
+  typedef struct stat kwStat;
+# define stat_func stat
+  #endif
+
+  bool Exists_;
+  kwStat Stat_;
+
+  void init(const char* fn)
+    {
+    int v = stat_func(fn,&this->Stat_);
+    this->Exists_ = (v == 0);
+    }
+};
 
 }//end namespace
 

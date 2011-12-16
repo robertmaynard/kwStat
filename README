@@ -9,15 +9,17 @@ So on Large Address 32bit builds we only plan on providing the 64bit stat functi
 Currently we are focused on getting file validity and file size functions correct.
 The second stage is to generalize the time aspect
 
-Usage of file_exists:
+Usage of kw::stat :
 
   #include "kwStat.h"
   #include <iostream>
+  #include <assert.h>
 
   int main(int argc, char **argv)
   {
-    bool exists = kw::file_exists("test.txt");
-    return exists;
+    kw::stat s("test.txt");
+	assert(s.fileExists()==true);
+    return 0;
   }
 
 Usage of file_length:
@@ -27,37 +29,7 @@ Usage of file_length:
 
   int main(int argc, char **argv)
   {
-    const char* fn="test.txt";
-    bool exists = kw::file_exists(fn);
-    if(exists)
-      {
-      assert(kw::file_length(fn)==0);
-      }
-    return exists;
+    kw::stat s("test.txt");
+    std::cout << s.fileLength() << std::endl;
+	return 0;
   }
-
-Usage of kwStat:
-
-  #include "kwStat.h"
-  #include <iostream>
-  //note kwStat doesn't unify time and still does
-  //32bit time on windows large address
-
-  int main(int argc, char **argv)
-  {
-    const char* fname = "test.txt";
-    kwStat ks;
-    int ret = kw_stat(fname,&ks);
-    if (!ret)
-      {
-      std::cout << "failed to open file" << std::endl;
-      }
-    else
-      {
-      off_t size = ks.st_size;
-      std::cout << "File test.txt has a length of " << size << std::endl;
-      }
-    return ret;
-  }
-
- 
