@@ -9,7 +9,51 @@
   implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the License for more information.
 ============================================================================*/
-#include <stdint.h>
+
+/*
+kwStat a cross platform stat function and structure.
+
+The goal is to provide a simple wrapper to to stat on 32bit and 64bit machines
+that properly handle large address support and the different signatures of the
+stat function.
+
+The primary goal is to always provide the largest aviable stat function.
+So on Large Address 32bit builds we only plan on providing the 64bit stat function.
+Currently we are focused on getting file validity and file size functions correct.
+The second stage is to generalize the time aspect
+
+Usage of kw::stat :
+
+  #include "kwStat.h"
+  #include <iostream>
+  #include <assert.h>
+
+  int main(int argc, char **argv)
+  {
+    kw::stat s("test.txt");
+  assert(s.fileExists()==true);
+    return 0;
+  }
+
+Usage of file_length:
+
+  #include "kwStat.h"
+  #include <iostream>
+
+  int main(int argc, char **argv)
+  {
+    kw::stat s("test.txt");
+    std::cout << s.fileLength() << std::endl;
+  return 0;
+  }
+*/
+
+//bring in int64_t types
+#ifdef _MSC_VER
+#include <stdio.h>
+#endif
+
+//requires string
 #include <string>
 
 #if defined(__GNUC__)
@@ -64,6 +108,14 @@
 namespace kw
 {
 
+#if defined(_MSC_VER)
+  //setup our own int64_t
+  typedef __int64 int64_t;
+#else
+  //setup our own int64_t
+  typedef int64_t int64_t;
+#endif
+
 class stat
   {
   public:
@@ -84,7 +136,7 @@ class stat
     Exists_(other.Exists_),
     Stat_(other.Stat_)
     {
-    
+
     }
 
   //assignment operator
@@ -105,25 +157,25 @@ class stat
   bool fileExists( ) const { return Exists_;}
 
   //return the length of the file
-  int64_t fileLength() const
+  kw::int64_t fileLength() const
     {
-    return this->fileExists() ? this->Stat_.st_size : -1;    
+    return this->fileExists() ? this->Stat_.st_size : -1;
     };
 
   //return the last modified time of the file
-  int64_t modifiedTime() const
+  kw::int64_t modifiedTime() const
     {
     return this->fileExists() ? this->Stat_.st_mtime : -1;
     }
 
   //return the last status time of the file
-  int64_t statusTime() const
+  kw::int64_t statusTime() const
     {
     return this->fileExists() ? this->Stat_.st_ctime : -1;
     }
 
   //return the last access time of the file
-  int64_t accessTime() const
+  kw::int64_t accessTime() const
     {
     return this->fileExists() ? this->Stat_.st_atime : -1;
     }
