@@ -48,6 +48,9 @@ Usage of file_length:
   }
 */
 
+#ifndef kwStat_h
+#define kwStat_h
+
 //bring in int64_t types
 #ifdef _MSC_VER
 #include <stdio.h>
@@ -119,14 +122,12 @@ namespace kw
 class stat
   {
   public:
-  stat(const char* fn):
-    Exists_(false)
+  stat(const char* fn)
     {
     this->init(fn);
     }
 
-  stat(const std::string &fn):
-    Exists_(false)
+  stat(const std::string &fn)
     {
     this->init(fn.c_str());
     }
@@ -208,3 +209,4 @@ class stat
 
 }//end namespace
 
+#endif
