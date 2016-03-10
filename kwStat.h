@@ -187,9 +187,13 @@ class stat
   typedef struct ::stat64 kwStat;
 # define stat_func ::stat64
 #elif defined(KW_USE_MS_STAT_64)
+  //while the msdn documentation refers to __stat64, that is a
+  //macro that resolves to _stat64, so don't use it
   typedef struct _stat64 kwStat;
 # define stat_func _stat64
 #elif defined(KW_USE_MS_STAT_I64)
+  //the msdn documentation explicitly uses a single underscore for this
+  //signature, and doesn't provide a double underscore macro either.
   typedef struct _stat32i64 kwStat;
 # define stat_func _stat32i64
 #else
